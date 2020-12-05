@@ -1,18 +1,8 @@
 const fs = require("fs");
 
-//var input = fs.readFileSync("input/day4.txt", "utf8").split("\n\n");
 var input = fs.readFileSync("input/day4.txt", "utf8").split("\n\n");
 
-let expected_fields = [
-    "byr",
-    "iyr",
-    "eyr",
-    "hgt",
-    "hcl",
-    "ecl",
-    "pid",
-    //'cid'
-];
+let expected_fields = ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"];
 
 function present(exp, passport) {
     for (const field of exp) {
@@ -81,8 +71,8 @@ function valid(exp, passport) {
                     if (num < 59 || num > 76) {
                         return false;
                     }
-                    // forgot to disqualify heights with no unit
                 } else {
+                    // forgot to disqualify heights with no unit
                     return false;
                 }
                 break;
