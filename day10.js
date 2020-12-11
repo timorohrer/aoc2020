@@ -15,7 +15,6 @@ let diff1 = 0,
 
 for (var i = 0; i < input.length; i++) {
     var diff = input[i + 1] - input[i];
-    // part 1 checks
     if (diff == 1) {
         diff1++;
     } else if (diff == 3) {
@@ -32,7 +31,7 @@ function rec(i) {
         return SEEN.get(i);
     }
     var ans = 0;
-    for (var j = i+1; j < input.length; j++) {
+    for (var j = i + 1; j < input.length; j++) {
         if (input[j] - input[i] <= 3) {
             ans += rec(j);
         }
