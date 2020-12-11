@@ -1,7 +1,6 @@
 const fs = require("fs");
 
 var input = fs.readFileSync("input/day11.txt", "utf8").split("\n");
-//var input = fs.readFileSync("input/test.txt", "utf8").split("\n");
 
 let arr = new Array();
 
@@ -13,7 +12,7 @@ for (const line of input) {
 // remove last limit array
 arr.pop();
 
-function adjacent(loc, arr, part) {
+adjacent = (loc, arr, part1) => {
     var count = 0;
     let directions = [
         [-1, -1],
@@ -26,9 +25,11 @@ function adjacent(loc, arr, part) {
         [0, -1],
     ];
 
+    // look over floor if part 2
+    var end = part1 ? 2 : arr[0].length;
+
     for (const dir of directions) {
         // only look at adjacent if part 1
-        var end = part ? 2 : arr[0].length;
         var go = dir;
         // per himmelsrichtung
         for (var i = 1; i < end; i++) {
@@ -37,27 +38,17 @@ function adjacent(loc, arr, part) {
             var adj = loc.map(function (num, idx) {
                 return num + go[idx];
             });
-            try {
-                // see what is at that location
+            if (arr[adj[0]] && arr[adj[1]]) {
+                // only look at in bounds seats
                 var atIndex = arr[adj[0]][adj[1]];
+                // see what is at that location
                 if (atIndex == "#") {
-                    // found occupied seat
                     count++;
                     break;
-                } else if (atIndex == "L") {
-                    // found limit seat
-                    break;
-                } else if (part && atIndex == ".") {
-                    // found floor
-                    break;
-                } else if (atIndex == undefined) {
+                } else if (atIndex == "L" || (part1 && atIndex == ".")) {
                     break;
                 }
-            } catch (err) {
-                //end of seating area
-                break;
             }
-            //console.log(loc, dir, go);
             // increase himmelsrichtung
             go = go.map(function (num, idx) {
                 return num + dir[idx];
@@ -65,23 +56,23 @@ function adjacent(loc, arr, part) {
         }
     }
     return count;
-}
+};
 
-function apply(arr, part) {
+apply = (arr, part1) => {
     // rules are applied to every seat simultaneously
 
     // shallow copy doesn't work because nested references will be
     // changed in the original array
     var newArr = arr.map((x) => x.map((y) => y));
 
-    var limit = part ? 4 : 5;
+    var limit = part1 ? 4 : 5;
 
     for (let row = 0; row < arr.length; row++) {
         for (let col = 0; col < arr[row].length; col++) {
             if (arr[row][col] == ".") {
                 continue;
             }
-            var adj = adjacent([row, col], arr, part);
+            var adj = adjacent([row, col], arr, part1);
             if (arr[row][col] == "L" && adj == 0) {
                 changed = true;
                 newArr[row][col] = "#";
@@ -92,17 +83,17 @@ function apply(arr, part) {
         }
     }
     return newArr;
-}
+};
 
-function iterations(input, part) {
-    let newArr = apply(input, part);
+iterations = (input, part1) => {
+    let newArr = apply(input, part1);
     if (changed) {
         changed = false;
-        return iterations(newArr, part);
+        return iterations(newArr, part1);
     } else {
         return JSON.stringify(newArr).match(/#/g).length;
     }
-}
+};
 
 //console.table(arr);
 console.log("Part 1: " + iterations(arr, true));
