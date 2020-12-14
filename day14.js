@@ -77,12 +77,11 @@ part2 = (input) => {
 
             let adresses = maskAdress(adress, mask);
             for (const adress of adresses) {
-                var parsed = parseInt(adress, 2);
-                memory[parsed] = value;
+                memory[adress] = value;
             }
         }
     }
-    return Object.values(memory).reduce((tot, curr) => tot + curr);
+    return Object.values(memory).reduce((sum, x) => sum + x);
 };
 
 console.log("Part 1: " + part1(input));
