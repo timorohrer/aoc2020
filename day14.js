@@ -7,45 +7,24 @@ replaceAt = function (str, index, replacement) {
     return str.substring(0, index) + replacement + str.substring(index + 1);
 };
 
-apply = (value, mask) => {
+allAdr = (mask) => {
+    if (!mask.includes("X")) {
+        return mask;
+    } else {
+        return [
+            allAdr(mask.replace("X", "0")),
+            allAdr(mask.replace("X", "1")),
+        ].flat();
+    }
+};
+
+maskValue = (value, mask) => {
     for (var i = 0; i < mask.length; i++) {
         if (mask[i] != "X") {
             value = replaceAt(value, i, mask[i]);
         }
     }
-    return value;
-};
-
-part1 = (input) => {
-    let memory = new Array();
-
-    let mask = new String();
-    let adress = new Number();
-    let value = new Number();
-
-    for (const line of input) {
-        if (line.slice(0, 4) == "mask") {
-            mask = line.slice(7);
-        } else {
-            [adress, value] = line.match(/\d+/g);
-            value = BigInt(value).toString(2);
-            value = value.padStart(mask.length, "0");
-            memory[BigInt(adress)] = apply(value, mask);
-        }
-    }
-
-    memory = memory.map((x) => parseInt(x, 2));
-
-    return memory.reduce((a, b) => a + b, 0);
-};
-
-const allAdr = (mask) => {
-    if (!mask.includes("X")) return mask;
-
-    return [
-        allAdr(mask.replace("X", "0")),
-        allAdr(mask.replace("X", "1")),
-    ].flat();
+    return parseInt(value, 2);
 };
 
 maskAdress = (adress, mask) => {
@@ -58,31 +37,36 @@ maskAdress = (adress, mask) => {
     }
     return allAdr(adress);
 };
-part2 = (input) => {
-    const memory = {};
 
+main = (input, part1) => {
+    let memory = new Object();
     let mask = new String();
-    let adress = new Number();
-    let value = new Number();
 
     for (const line of input) {
         if (line.slice(0, 4) == "mask") {
             mask = line.slice(7);
         } else {
-            [adress, value] = line.match(/\d+/g);
-            value = parseInt(value);
+            let [adress, value] = line.match(/\d+/g);
 
-            adress = BigInt(adress).toString(2);
-            adress = adress.padStart(mask.length, "0");
+            if (part1) {
+                value = BigInt(value).toString(2);
+                value = value.padStart(mask.length, "0");
+                memory[BigInt(adress)] = maskValue(value, mask);
+            } else {
+                value = parseInt(value);
+                adress = BigInt(adress).toString(2);
+                adress = adress.padStart(mask.length, "0");
 
-            let adresses = maskAdress(adress, mask);
-            for (const adress of adresses) {
-                memory[adress] = value;
+                let adresses = maskAdress(adress, mask);
+                for (const adress of adresses) {
+                    memory[adress] = value;
+                }
             }
         }
     }
+
     return Object.values(memory).reduce((sum, x) => sum + x);
 };
 
-console.log("Part 1: " + part1(input));
-console.log("Part 2: " + part2(input));
+console.log("Part 1: " + main(input, true));
+console.log("Part 2: " + main(input, false));
